@@ -157,10 +157,29 @@
           if (!elements[title][entry.uid]) {
             elements[title][entry.uid] = {}
             elements[title][entry.uid].frame = createEntry(name, value)
-            elements[title].frame.append(elements[title][entry.uid].frame)
           } else {
             elements[title][entry.uid].frame.value.innerHTML = value
           }
+        }
+      }
+
+      /* sort all entries by name */
+      for (title in elements) {
+        var index = []
+        for (var uid in elements[title]) {
+          if (uid != "frame") {
+            index.push({ 'key': uid, 'cmp': elements[title][uid].frame.name.innerHTML })
+          }
+        }
+
+        index.sort((a, b) => {
+          var as = a['cmp'], bs = b['cmp'];
+          return as.localeCompare(bs, undefined, { numeric:true })
+         })
+
+        for (var i = 0; i < index.length; i++) {
+          let object = elements[title][index[i]['key']]
+          elements[title].frame.appendChild(object.frame)
         }
       }
     }
