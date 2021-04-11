@@ -1,8 +1,12 @@
+/* load all modules */
+const fs   = require('fs')
+const http = require('http')
+const glob = require('glob')
+const path = require('path')
+const mqtt = require('mqtt')
+
 /* load devices */
 var devices = {}
-var glob = require('glob')
-var path = require('path')
-
 console.log("Loading Devices")
 glob.sync('./devices/*.js' ).forEach((file) => {
   var inc = require(path.resolve(file))
@@ -31,14 +35,12 @@ var view = {
 }
 
 /* provide JSON API of current view */
-const http = require('http')
 http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'application/json'})
   res.end(JSON.stringify(view.data))
 }).listen(8080)
 
 /* connect to MQTT broker */
-const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://mqtt.midgard')
 client.on('message', (topic, msg) => {
   /* search for known device and update view */
