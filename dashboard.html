@@ -2,27 +2,36 @@
 
 <style>
   body { background: #000; }
+  #viewport { margin: auto; color: #fff; }
 </style>
 
+<div id="viewport">Loading...</div>
+
 <script>
-window.setInterval(function() {
-  let request = new XMLHttpRequest()
-  request.open('GET', "http://localhost:8044/json")
-  request.responseType = 'json'
-  request.send()
+  let view = document.getElementById('viewport')
+  let elements = {}
 
-  request.onload = function() {
-    const data = request.response
+  /* spaghetti goes here - tastes like copy pasta */
+  window.setInterval(function() {
+    view.innerHTML = ""
 
-    /* show temperatures */
-    for (entry in data["temperature"]) {
-      console.log(data["temperature"][entry]["current"])
+    let request = new XMLHttpRequest()
+    request.open('GET', "http://localhost:8044/json")
+    request.responseType = 'json'
+    request.send()
+
+    request.onload = function() {
+      const data = request.response
+
+      /* show temperatures */
+      for (entry in data["temperature"]) {
+        console.log(data["temperature"][entry]["current"])
+      }
+
+      /* show devices */
+      for (entry in data["device-tracker"]) {
+        console.log(data["device-tracker"][entry]["mac"])
+      }
     }
-
-    /* show devices */
-    for (entry in data["device-tracker"]) {
-      console.log(data["device-tracker"][entry]["mac"])
-    }
-  }
-}, 1000)
+  }, 1000)
 </script>
