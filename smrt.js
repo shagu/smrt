@@ -39,6 +39,16 @@ http.createServer((req, res) => {
   if (req.url == "/json") {
     res.writeHead(200, {'Content-Type': 'application/json'})
     res.end(JSON.stringify(view.data))
+  } else if (req.url == "/logo.png") {
+    fs.readFile("logo.png", (err,data) => {
+      if (err) {
+        res.writeHead(404)
+        res.end(JSON.stringify(err))
+        return
+      }
+      res.writeHead(200)
+      res.end(data)
+    })
   } else {
     fs.readFile("dashboard.html", (err,data) => {
       if (err) {
