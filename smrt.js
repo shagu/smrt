@@ -34,24 +34,23 @@ var view = {
   }
 }
 
-/* provide JSON API of current view */
+/* server dashboard and json on localhost */
 http.createServer((req, res) => {
-  res.writeHead(200, {'Content-Type': 'application/json'})
-  res.end(JSON.stringify(view.data))
+  if (req.url == "/json") {
+    res.writeHead(200, {'Content-Type': 'application/json'})
+    res.end(JSON.stringify(view.data))
+  } else {
+    fs.readFile("dashboard.html", (err,data) => {
+      if (err) {
+        res.writeHead(404)
+        res.end(JSON.stringify(err))
+        return
+      }
+      res.writeHead(200)
+      res.end(data)
+    })
+  }
 }).listen(8044)
-
-/* serve dashboard on localhost */
-http.createServer((req, res) => {
-  fs.readFile("dashboard.html", (err,data) => {
-    if (err) {
-      res.writeHead(404)
-      res.end(JSON.stringify(err))
-      return
-    }
-    res.writeHead(200)
-    res.end(data)
-  })
-}).listen(8444)
 
 /* connect to MQTT broker */
 const client = mqtt.connect('mqtt://mqtt.midgard')
