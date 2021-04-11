@@ -56,7 +56,7 @@ http.createServer((req, res) => {
         res.end(JSON.stringify(err))
         return
       }
-      res.writeHead(200)
+      res.writeHead(200, {'Content-Type': 'text/html'})
       res.end(data)
     })
   }
