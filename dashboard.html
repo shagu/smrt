@@ -1,36 +1,167 @@
 <meta charset="UTF-8" />
 
 <style>
-  body { background: #000; }
-  #viewport { margin: auto; color: #fff; }
+  body {
+    background: #fafafa;
+    font-family: 'Cantarell', 'Lucida Sans', 'Arial', sans-serif;
+    margin: 0px;
+  }
+
+  div.topbar {
+    background: #fff url("./logo.png");
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size:contain;
+    border-bottom: 1px #ccc solid;
+    box-shadow: #ccc 0px 0px 5px;
+    color: #420;
+    padding: 15px;
+    font-size: 24pt;
+    font-weight: bold;
+    padding-left: 75px;
+  }
+
+  div.topbar small {
+    color: #000;
+    font-weight: 300;
+  }
+  div.topbar span {
+    font-weight: 100;
+    font-size: 16pt;
+    color: #000;
+  }
+
+  #viewport { margin: auto; color: #333; }
+
+  div.section {
+    float: left;
+    display: inline-block;
+    border: 1px #ccc solid;
+    padding: 15px;
+    margin: 15px;
+    background: #fff;
+    box-shadow: #ccc 0px 0px 5px;
+    border-radius: 5px;
+  }
+
+  div.section div.section-title {
+    color: #420;
+    font-size: 16pt;
+    padding: 5px 0px;
+  }
+
+  div.element {
+    border-bottom: 1px #eee dashed;
+    display: flex;
+    clear: both;
+  }
+
+  div.element div.element-name {
+    flex-grow: 4;
+    padding: 3px 10px 3px 3px;
+  }
+
+  div.element div.element-value {
+    flex-grow: 1;
+    padding: 3px 3px 3px 10px;
+    font-weight: bold;
+    text-align: right;
+  }
 </style>
 
+<div class="topbar">smrt<small> - </small><span>dashboard</span></div>
 <div id="viewport">Loading...</div>
 
 <script>
   let view = document.getElementById('viewport')
   let elements = {}
 
+  function createSection(name) {
+    const frame = document.createElement('div')
+    frame.className = "section"
+
+    title = document.createElement('div')
+    title.className = "section-title"
+    title.innerHTML = name
+    frame.append(title)
+
+    return frame
+  }
+
+  function createEntry(name, value) {
+    const frame = document.createElement('div')
+    frame.className = "element"
+
+    elementName = document.createElement('div')
+    elementName.className = "element-name"
+    elementName.innerHTML = name
+    frame.append(elementName)
+
+    elementValue = document.createElement('div')
+    elementValue.className = "element-value"
+    elementValue.innerHTML = value
+    frame.append(elementValue)
+
+    frame.name = elementName
+    frame.value = elementValue
+
+    return frame
+  }
+
   /* spaghetti goes here - tastes like copy pasta */
   window.setInterval(function() {
-    view.innerHTML = ""
-
     let request = new XMLHttpRequest()
     request.open('GET', "http://localhost:8044/json")
     request.responseType = 'json'
     request.send()
 
     request.onload = function() {
-      const data = request.response
-
-      /* show temperatures */
-      for (entry in data["temperature"]) {
-        console.log(data["temperature"][entry]["current"])
+      /* clear loading screen */
+      if (view.innerHTML == "Loading...") {
+        view.innerHTML = ""
       }
 
-      /* show devices */
-      for (entry in data["device-tracker"]) {
-        console.log(data["device-tracker"][entry]["mac"])
+      /* iterate over json */
+      const data = request.response
+      for (section in data) {
+        for (id in data[section]) {
+          var entry = data[section][id]
+          let name = entry.uid
+          let value = entry.uid
+          let title = section
+
+          /* uglyfix outputs based on type */
+          if (section == "temperature") {
+            title = "Temperatur"
+            name = entry.name
+            value = entry.current + "°C"
+          } else if (section == "device-tracker") {
+            if (entry.ipv == "ipv6") {
+              title = "Device Tracker (IPv6)"
+            } else {
+              title = "Device Tracker (IPv4)"
+            }
+
+            name = entry.ip
+            value = entry.name
+          }
+
+          /* create section if not existing */
+          if (!elements[title]) {
+            elements[title] = {}
+            elements[title].frame = createSection(title)
+            view.append(elements[title].frame)
+          }
+
+          /* create or update element */
+          if (!elements[title][entry.uid]) {
+            elements[title][entry.uid] = {}
+            elements[title][entry.uid].frame = createEntry(name, value)
+            elements[title].frame.append(elements[title][entry.uid].frame)
+          } else {
+            elements[title][entry.uid].frame.value.innerHTML = value
+          }
+        }
       }
     }
   }, 1000)
