@@ -1,3 +1,28 @@
+<meta charset="UTF-8" />
+
 <style>
-    body { background: #000; }
+  body { background: #000; }
 </style>
+
+<script>
+window.setInterval(function() {
+  let request = new XMLHttpRequest()
+  request.open('GET', "http://localhost:8044/json")
+  request.responseType = 'json'
+  request.send()
+
+  request.onload = function() {
+    const data = request.response
+
+    /* show temperatures */
+    for (entry in data["temperature"]) {
+      console.log(data["temperature"][entry]["current"])
+    }
+
+    /* show devices */
+    for (entry in data["device-tracker"]) {
+      console.log(data["device-tracker"][entry]["mac"])
+    }
+  }
+}, 1000)
+</script>
