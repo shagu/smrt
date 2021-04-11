@@ -1,6 +1,6 @@
 # smrt
 
-**INFO: Under development and not ready yet.**
+**WARNING: Under development and not ready yet.**
 
 This project aims to be an mqtt home dashboard and automation trigger (*TBD*). Its goal is to listen on a specified [MQTT](https://mqtt.org/) broker, automatically adding known devices to the [dashboard](#dashboard) and trigger [automations](#automations) based on the given script files (*TBD*).
 
@@ -19,7 +19,7 @@ The dashboard is served on [localhost:8044](http://localhost:8044) and reads the
 
 ## devices
 
-Known devices can be added to the devices folder. Have a look at [homematic.js](devices/homematic.js) and [openwrt.js](devices/homematic) to see examples. A valid device configuration must contain the MQTT topic pattern that it should trigger on, aswell as a `getData` function that returns an object containing:
+Known devices can be added to the devices folder. Have a look at [homematic.js](devices/homematic.js) and [openwrt.js](devices/openwrt.js) to see examples. A valid device configuration must contain the MQTT topic pattern that it should trigger on, aswell as a `getData` function that returns an object containing:
 
 - `uid`: a unique identifier of the device that shall be added to the overview
 - `name`: the name of the device used on the dashboard
