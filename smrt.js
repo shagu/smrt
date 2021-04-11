@@ -42,7 +42,7 @@ http.createServer((req, res) => {
 
 /* serve dashboard on localhost */
 http.createServer((req, res) => {
-  fs.readFile("index.html", (err,data) => {
+  fs.readFile("dashboard.html", (err,data) => {
     if (err) {
       res.writeHead(404)
       res.end(JSON.stringify(err))
