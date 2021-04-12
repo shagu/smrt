@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "mqtt": "^4.2.6"
+    "express": "^4.17.1",
+    "mqtt": "^4.2.6",
+    "socket.io": "^4.0.1"
   },
   "scripts": {
     "test": "standard",
