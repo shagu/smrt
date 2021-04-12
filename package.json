@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "mqtt": "^4.2.6"
+  },
+  "scripts": {
+    "test": "standard",
+    "lint": "standard --fix"
   }
 }
