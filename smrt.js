@@ -1,9 +1,14 @@
 /* load all modules */
 const fs = require('fs')
-const http = require('http')
 const glob = require('glob')
 const path = require('path')
 const mqtt = require('mqtt')
+
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 
 /* load devices */
 const devices = {}
@@ -34,45 +39,46 @@ const view = {
   }
 }
 
-/* server dashboard and json on localhost */
-http.createServer((req, res) => {
-  if (req.url === '/json') {
-    res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(view.data))
-  } else if (req.url === '/logo.png') {
-    fs.readFile('logo.png', (err, data) => {
-      if (err) {
-        res.writeHead(404)
-        res.end(JSON.stringify(err))
-        return
-      }
-      res.writeHead(200)
-      res.end(data)
-    })
-  } else {
-    fs.readFile('dashboard.html', (err, data) => {
-      if (err) {
-        res.writeHead(404)
-        res.end(JSON.stringify(err))
-        return
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html' })
-      res.end(data)
-    })
-  }
-}).listen(8044)
+/* server dashboard, logo and json on localhost */
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/dashboard.html')
+})
+
+app.get('/logo.png', (req, res) => {
+  res.sendFile(__dirname + '/logo.png')
+})
+
+app.get('/json', (req, res) => {
+  res.json(view.data)
+})
+
+server.listen(8044, () => {
+  console.log("Starting Webserver")
+})
+
+/* send view to new clients */
+io.on('connection', (socket) => {
+  io.emit('view', view.data)
+});
 
 /* connect to MQTT broker */
 const client = mqtt.connect('mqtt://mqtt.midgard')
 client.on('message', (topic, msg) => {
+  let update = false
   /* search for known device and update view */
   for (const vendor in devices) {
     for (const pattern in devices[vendor]) {
       if (topic.match(pattern)) {
         const device = devices[vendor][pattern]
         view.addEntry(device, topic, msg.toString())
+        update = true
       }
     }
+  }
+
+  /* send view update to webfrontend */
+  if (update === true) {
+    io.emit('view', view.data)
   }
 })
 
