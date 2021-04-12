@@ -4,11 +4,11 @@ const glob = require('glob')
 const path = require('path')
 const mqtt = require('mqtt')
 
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const io = require('socket.io')(server);
+const express = require('express')
+const app = express()
+const http = require('http')
+const server = http.createServer(app)
+const io = require('socket.io')(server)
 
 /* load devices */
 const devices = {}
@@ -53,13 +53,13 @@ app.get('/json', (req, res) => {
 })
 
 server.listen(8044, () => {
-  console.log("Starting Webserver")
+  console.log('Starting Webserver')
 })
 
 /* send view to new clients */
 io.on('connection', (socket) => {
   io.emit('view', view.data)
-});
+})
 
 /* connect to MQTT broker */
 const client = mqtt.connect('mqtt://mqtt.midgard')
