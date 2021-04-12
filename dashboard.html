@@ -125,9 +125,9 @@
       const data = request.response
       for (section in data) {
         for (id in data[section]) {
-          var entry = data[section][id]
+          let entry = data[section][id]
           let name = entry.uid
-          let value = entry.uid
+          let value = entry.value
           let title = section
 
           /* uglyfix outputs based on type */
@@ -165,19 +165,19 @@
 
       /* sort all entries by name */
       for (title in elements) {
-        var index = []
-        for (var uid in elements[title]) {
-          if (uid != "frame") {
+        const index = []
+        for (let uid in elements[title]) {
+          if (uid !== "frame") {
             index.push({ 'key': uid, 'cmp': elements[title][uid].frame.name.innerHTML })
           }
         }
 
         index.sort((a, b) => {
-          var as = a['cmp'], bs = b['cmp'];
-          return as.localeCompare(bs, undefined, { numeric:true })
+          let as = a['cmp'], bs = b['cmp'];
+          return as.localeCompare(bs, undefined, { numeric: true })
          })
 
-        for (var i = 0; i < index.length; i++) {
+        for (let i = 0; i < index.length; i++) {
           let object = elements[title][index[i]['key']]
           elements[title].frame.appendChild(object.frame)
         }
