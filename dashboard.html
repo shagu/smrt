@@ -144,6 +144,10 @@
 
             name = entry.ip
             value = entry.name
+          } else if (section == "light") {
+            title = "Licht"
+            name = entry.name
+            value = entry.brightness ? `${entry.value} (${entry.brightness})` : entry.value
           }
 
           /* create section if not existing */
