@@ -40,11 +40,11 @@ const view = {
 
 /* server dashboard, logo and json on localhost */
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/dashboard.html')
+  res.sendFile(path.join(__dirname, 'dashboard.html'))
 })
 
 app.get('/logo.png', (req, res) => {
-  res.sendFile(__dirname + '/logo.png')
+  res.sendFile(path.join(__dirname, '/logo.png'))
 })
 
 app.get('/json', (req, res) => {
