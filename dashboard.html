@@ -1,4 +1,5 @@
 <meta charset="UTF-8" />
+<script src="/socket.io/socket.io.js"></script>
 
 <style>
   body {
@@ -70,9 +71,10 @@
 </style>
 
 <div class="topbar">smrt<small> - </small><span>dashboard</span></div>
-<div id="viewport">Loading...</div>
+<div id="viewport"></div>
 
 <script>
+  let socket = io()
   let view = document.getElementById('viewport')
   let elements = {}
 
@@ -109,83 +111,71 @@
   }
 
   /* spaghetti goes here - tastes like copy pasta */
-  window.setInterval(function() {
-    let request = new XMLHttpRequest()
-    request.open('GET', "http://localhost:8044/json")
-    request.responseType = 'json'
-    request.send()
+  socket.on('view', function(msg) {
+    /* iterate over json */
+    const data = msg
+    for (section in data) {
+      for (id in data[section]) {
+        let entry = data[section][id]
+        let name = entry.uid
+        let value = entry.value
+        let title = section
 
-    request.onload = function() {
-      /* clear loading screen */
-      if (view.innerHTML == "Loading...") {
-        view.innerHTML = ""
-      }
-
-      /* iterate over json */
-      const data = request.response
-      for (section in data) {
-        for (id in data[section]) {
-          let entry = data[section][id]
-          let name = entry.uid
-          let value = entry.value
-          let title = section
-
-          /* uglyfix outputs based on type */
-          if (section == "temperature") {
-            title = "Temperatur"
-            name = entry.name
-            value = entry.current + "°C"
-          } else if (section == "device-tracker") {
-            if (entry.ipv == "ipv6") {
-              title = "Device Tracker (IPv6)"
-            } else {
-              title = "Device Tracker (IPv4)"
-            }
-
-            name = entry.ip
-            value = entry.name
-          } else if (section == "light") {
-            title = "Licht"
-            name = entry.name
-            value = entry.brightness ? `${entry.value} (${entry.brightness})` : entry.value
-          }
-
-          /* create section if not existing */
-          if (!elements[title]) {
-            elements[title] = {}
-            elements[title].frame = createSection(title)
-            view.append(elements[title].frame)
-          }
-
-          /* create or update element */
-          if (!elements[title][entry.uid]) {
-            elements[title][entry.uid] = {}
-            elements[title][entry.uid].frame = createEntry(name, value)
+        /* uglyfix outputs based on type */
+        if (section == "temperature") {
+          title = "Temperatur"
+          name = entry.name
+          value = entry.current + "°C"
+        } else if (section == "device-tracker") {
+          if (entry.ipv == "ipv6") {
+            title = "Device Tracker (IPv6)"
           } else {
-            elements[title][entry.uid].frame.value.innerHTML = value
+            title = "Device Tracker (IPv4)"
           }
-        }
-      }
 
-      /* sort all entries by name */
-      for (title in elements) {
-        const index = []
-        for (let uid in elements[title]) {
-          if (uid !== "frame") {
-            index.push({ 'key': uid, 'cmp': elements[title][uid].frame.name.innerHTML })
-          }
+          name = entry.ip
+          value = entry.name
+        } else if (section == "light") {
+          title = "Licht"
+          name = entry.name
+          value = entry.brightness ? `${entry.value} (${entry.brightness})` : entry.value
         }
 
-        index.sort((a, b) => {
-          let as = a['cmp'], bs = b['cmp'];
-          return as.localeCompare(bs, undefined, { numeric: true })
-         })
+        /* create section if not existing */
+        if (!elements[title]) {
+          elements[title] = {}
+          elements[title].frame = createSection(title)
+          view.append(elements[title].frame)
+        }
 
-        for (let i = 0; i < index.length; i++) {
-          let object = elements[title][index[i]['key']]
-          elements[title].frame.appendChild(object.frame)
+        /* create or update element */
+        if (!elements[title][entry.uid]) {
+          elements[title][entry.uid] = {}
+          elements[title][entry.uid].frame = createEntry(name, value)
+        } else {
+          elements[title][entry.uid].frame.value.innerHTML = value
         }
       }
     }
-  }, 1000)
+
+    /* sort all entries by name */
+    for (title in elements) {
+      const index = []
+      for (let uid in elements[title]) {
+        if (uid !== "frame") {
+          index.push({ 'key': uid, 'cmp': elements[title][uid].frame.name.innerHTML })
+        }
+      }
+
+      index.sort((a, b) => {
+        let as = a['cmp'], bs = b['cmp'];
+        return as.localeCompare(bs, undefined, { numeric: true })
+       })
+
+      for (let i = 0; i < index.length; i++) {
+        let object = elements[title][index[i]['key']]
+        elements[title].frame.appendChild(object.frame)
+      }
+    }
+  })
 </script>
