@@ -13,7 +13,7 @@ This project aims to be an mqtt home dashboard and automation trigger (*TBD*). I
 
 ## dashboard
 
-The dashboard is served on [localhost:8044](http://localhost:8044) and reads the `smart.js` prepared JSON from [localhost:8044/json](http://localhost:8044/json).
+The dashboard is served on [localhost:8044](http://localhost:8044) and receives a viewport prepared by the `smart.js` backend. The view is sent to the dashboard via socket.io but can also be reviewed on [localhost:8044/json](http://localhost:8044/json) for debugging reasons.
 
 ![preview](preview.png)
 
