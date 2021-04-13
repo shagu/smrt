@@ -4,9 +4,9 @@ exports.device = {
     /* actual temperatures */
     '^hm/status/(.+):[0-9]/ACTUAL_TEMPERATURE$': {
       getData: (topic, msg) => {
-        let name = topic.match('^hm/status/(.+):[0-9]/ACTUAL_TEMPERATURE$')[1]
-        let value = JSON.parse(msg).val.toFixed(1)
-        let category = "temperature"
+        const name = topic.match('^hm/status/(.+):[0-9]/ACTUAL_TEMPERATURE$')[1]
+        const value = JSON.parse(msg).val.toFixed(1)
+        const category = 'temperature'
 
         const data = {
           1: {
@@ -16,11 +16,11 @@ exports.device = {
             device: name,
 
             /* dashboard */
-            name: "$device",
-            value: "$current°C ($target°C)",
+            name: '$device',
+            value: '$current°C ($target°C)',
 
             /* custom data fields */
-            current: value,
+            current: value
           }
         }
 

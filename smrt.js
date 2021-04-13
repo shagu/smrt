@@ -9,11 +9,11 @@ const http = require('http')
 const server = http.createServer(app)
 const io = require('socket.io')(server)
 
-var crypto = require('crypto')
+const crypto = require('crypto')
 
 /* prepare global scope for device files */
 /* simple sha256 hash for uids */
-hash = function hash(str) {
+hash = function hash (str) {
   return crypto.createHash('sha256').update(str).digest('hex')
 }
 
