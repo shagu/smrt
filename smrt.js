@@ -9,13 +9,21 @@ const http = require('http')
 const server = http.createServer(app)
 const io = require('socket.io')(server)
 
+var crypto = require('crypto')
+
+/* prepare global scope for device files */
+/* simple sha256 hash for uids */
+hash = function hash(str) {
+  return crypto.createHash('sha256').update(str).digest('hex')
+}
+
 /* load devices */
 const devices = {}
 console.log('Loading Devices')
 glob.sync('./devices/*.js').forEach((file) => {
   const inc = require(path.resolve(file))
-  console.log(' - ' + inc.vendor.name)
-  devices[inc.vendor.name] = inc.vendor.entries
+  console.log(' - ' + inc.device.name)
+  devices[inc.device.name] = inc.device.topics
 })
 
 /* initialize view */
@@ -27,13 +35,16 @@ const view = {
 
     Object.keys(data).forEach(id => {
       // add or merge new data with view table
-      const type = data[id].type
+      const category = data[id].category
       const uid = data[id].uid
 
-      view.data[type] = view.data[type] ? view.data[type] : {}
-      view.data[type][uid] = view.data[type][uid] ? view.data[type][uid] : {}
-      Object.assign(view.data[type][uid], data[id])
-      view.data[type][uid].seen = Date.now()
+      // create new view entries if not existing
+      view.data[category] = view.data[category] ? view.data[category] : {}
+      view.data[category][uid] = view.data[category][uid] ? view.data[category][uid] : {}
+
+      // merge new data with existing entries
+      Object.assign(view.data[category][uid], data[id])
+      view.data[category][uid].seen = Date.now()
     })
   }
 }

@@ -1,15 +1,25 @@
-exports.vendor = {
+exports.device = {
   name: 'wled',
-  entries: {
+  topics: {
     /* wled status */
     '^wled/(.+)/status$': {
       getData: (topic, msg) => {
+        let name = topic.match('^wled/(.+)/status$')[1]
+        let category = "light"
+
         const data = {
           1: {
-            uid: topic.match('^wled/(.+)/status$')[1],
-            type: 'light',
-            name: topic.match('^wled/(.+)/status$')[1],
-            value: msg === 'online' ? 'ON' : 'OFF'
+            /* device data */
+            uid: hash(category + name),
+            category: category,
+            device: name,
+
+            /* dashboard */
+            name: "$device",
+            value: "$state ($brightness)",
+
+            /* custom data fields */
+            state: msg === 'online' ? 'On' : 'Off',
           }
         }
         return data
@@ -19,12 +29,22 @@ exports.vendor = {
     /* wled brightness */
     '^wled/(.+)/g$': {
       getData: (topic, msg) => {
+        let name = topic.match('^wled/(.+)/g$')[1]
+        let category = "light"
+
         const data = {
           1: {
-            uid: topic.match('^wled/(.+)/g$')[1],
-            type: 'light',
-            name: topic.match('^wled/(.+)/g$')[1],
-            brightness: msg + '%'
+            /* device data */
+            uid: hash(category + name),
+            category: category,
+            device: name,
+
+            /* dashboard */
+            name: "$device",
+            value: "$state ($brightness)",
+
+            /* custom data fields */
+            brightness: msg + '%',
           }
         }
         return data
