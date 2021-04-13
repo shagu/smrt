@@ -110,6 +110,18 @@
     return frame
   }
 
+  function parse(obj, text) {
+    const regexp = RegExp('\\$[A-Za-z]*','g')
+    let match
+    let output = text
+    while ((match = regexp.exec(text)) !== null) {
+      let key = match[0].replace('$', '')
+      output = output.replace(match[0], obj[key] || "?")
+    }
+
+    return output
+  }
+
   /* spaghetti goes here - tastes like copy pasta */
   socket.on('view', function(msg) {
     /* iterate over json */
@@ -117,29 +129,10 @@
     for (section in data) {
       for (id in data[section]) {
         let entry = data[section][id]
-        let name = entry.uid
-        let value = entry.value
-        let title = section
 
-        /* uglyfix outputs based on type */
-        if (section == "temperature") {
-          title = "Temperatur"
-          name = entry.name
-          value = entry.current + "°C"
-        } else if (section == "device-tracker") {
-          if (entry.ipv == "ipv6") {
-            title = "Device Tracker (IPv6)"
-          } else {
-            title = "Device Tracker (IPv4)"
-          }
-
-          name = entry.ip
-          value = entry.name
-        } else if (section == "light") {
-          title = "Licht"
-          name = entry.name
-          value = entry.brightness ? `${entry.value} (${entry.brightness})` : entry.value
-        }
+        let title = entry.category
+        let name = parse(entry, entry.name)
+        let value = parse(entry, entry.value)
 
         /* create section if not existing */
         if (!elements[title]) {
